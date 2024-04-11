@@ -12,7 +12,7 @@ class ViewController: UIViewController {
   // MARK: -
   // MARK: Properties
   
-  let cameraTypeView = CameraTypeView()
+  var cameraTypeView: FNCameraTypeView!
   
   // MARK: -
   // MARK: View Lifecycle
@@ -22,6 +22,7 @@ class ViewController: UIViewController {
     
     view.backgroundColor = .black
     
+    cameraTypeView = .init(delegate: self)
     cameraTypeView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(cameraTypeView)
     
@@ -29,5 +30,11 @@ class ViewController: UIViewController {
       cameraTypeView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       cameraTypeView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -16)
     ])
+  }
+}
+
+extension ViewController: FNCameraTypeViewDelegate {
+  func cameraTypeView(_ cameraTypeView: FNCameraTypeView, didSelectCameraType type: CameraType) {
+    debugPrint("👌 didSelectCameraType: \(type)")
   }
 }

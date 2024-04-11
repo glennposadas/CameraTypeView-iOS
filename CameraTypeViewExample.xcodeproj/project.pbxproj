@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		45324BC92BC3C3B30064079A /* CameraTypeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45324BC82BC3C3B30064079A /* CameraTypeView.swift */; };
+		45324BC92BC3C3B30064079A /* FNCameraTypeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45324BC82BC3C3B30064079A /* FNCameraTypeView.swift */; };
 		455DA0E92BC32B5400031501 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 455DA0E82BC32B5400031501 /* AppDelegate.swift */; };
 		455DA0EB2BC32B5400031501 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 455DA0EA2BC32B5400031501 /* SceneDelegate.swift */; };
 		455DA0ED2BC32B5400031501 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 455DA0EC2BC32B5400031501 /* ViewController.swift */; };
@@ -37,7 +37,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		45324BC82BC3C3B30064079A /* CameraTypeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraTypeView.swift; sourceTree = "<group>"; };
+		45324BC82BC3C3B30064079A /* FNCameraTypeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FNCameraTypeView.swift; sourceTree = "<group>"; };
 		455DA0E52BC32B5400031501 /* CameraTypeViewExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CameraTypeViewExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		455DA0E82BC32B5400031501 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		455DA0EA2BC32B5400031501 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -108,7 +108,7 @@
 				455DA0F12BC32B5600031501 /* Assets.xcassets */,
 				455DA0F32BC32B5600031501 /* LaunchScreen.storyboard */,
 				455DA0F62BC32B5600031501 /* Info.plist */,
-				45324BC82BC3C3B30064079A /* CameraTypeView.swift */,
+				45324BC82BC3C3B30064079A /* FNCameraTypeView.swift */,
 			);
 			path = CameraTypeViewExample;
 			sourceTree = "<group>";
@@ -262,7 +262,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				455DA0ED2BC32B5400031501 /* ViewController.swift in Sources */,
-				45324BC92BC3C3B30064079A /* CameraTypeView.swift in Sources */,
+				45324BC92BC3C3B30064079A /* FNCameraTypeView.swift in Sources */,
 				455DA0E92BC32B5400031501 /* AppDelegate.swift in Sources */,
 				455DA0EB2BC32B5400031501 /* SceneDelegate.swift in Sources */,
 			);

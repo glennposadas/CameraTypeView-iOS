@@ -1,5 +1,5 @@
 //
-//  CameraTypeView.swift
+//  FNCameraTypeView.swift
 //  SiteCapture
 //
 //  Created by Glenn Posadas on 4/8/24.
@@ -53,14 +53,38 @@ class OptionCell: UICollectionViewCell {
 }
 
 // MARK: -
-// MARK: CameraTypeView
+// MARK: FNCameraTypeView
 
-class CameraTypeView: UIView {
+enum CameraType {
+  case video
+  case photo
+}
+
+protocol FNCameraTypeViewDelegate: AnyObject {
+  func cameraTypeView(_ cameraTypeView: FNCameraTypeView,
+                      didSelectCameraType type: CameraType)
+}
+
+class FNCameraTypeView: UIView {
   
   // MARK: Properties
   
   let options: [String] = ["", "PHOTO", "VIDEO", ""]
-  var selectedIndex = 1
+  private(set) var selectedIndex = 1 {
+    didSet {
+      let newSelectedType: CameraType = selectedIndex == 1 ? .photo : .video
+      if selectedType != newSelectedType {
+        selectedType = newSelectedType
+      }
+    }
+  }
+  private(set) var selectedType: CameraType = .photo {
+    didSet {
+      delegate?.cameraTypeView(self, didSelectCameraType: selectedType)
+    }
+  }
+  
+  private(set) weak var delegate: FNCameraTypeViewDelegate?
   
   lazy var collectionView: UICollectionView = {
     let layout = UICollectionViewFlowLayout()
@@ -74,6 +98,7 @@ class CameraTypeView: UIView {
     collectionView.isPagingEnabled = true
     collectionView.delegate = self
     collectionView.dataSource = self
+    collectionView.decelerationRate = .fast
     collectionView.register(OptionCell.self, forCellWithReuseIdentifier: "OptionCell")
     collectionView.backgroundColor = .lightGray
     return collectionView
@@ -85,6 +110,11 @@ class CameraTypeView: UIView {
     super.init(frame: frame)
     
     setupUI()
+  }
+  
+  convenience init(delegate: FNCameraTypeViewDelegate?) {
+    self.init(frame: .zero)
+    self.delegate = delegate
   }
   
   required init?(coder: NSCoder) {
@@ -111,7 +141,7 @@ class CameraTypeView: UIView {
 
 // MARK: UICollectionViewDataSource
 
-extension CameraTypeView: UICollectionViewDataSource {
+extension FNCameraTypeView: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     return options.count
   }
@@ -137,7 +167,7 @@ extension CameraTypeView: UICollectionViewDataSource {
 
 // MARK: Set and Reset
 
-extension CameraTypeView {
+extension FNCameraTypeView {
   // SET ----
   func setCenteredCell(_ scrollView: UIScrollView) {
     guard let superview = self.superview else { return }
@@ -153,13 +183,17 @@ extension CameraTypeView {
   }
   
   // RESET---
-  func resetPreviouslyCentedCell(_ scrollView: UIScrollView) {
+  func resetPreviouslyCentedCell(_ scrollView: UIScrollView, shouldStoreIndex: Bool) {
     guard let superview = self.superview else { return }
     let y = frame.origin.y + 25
     let centerPoint = CGPoint(x: superview.bounds.midX, y: y)
     let collectionViewCenterPoint = superview.convert(centerPoint, to: collectionView)
     
     if let indexPath = collectionView.indexPathForItem(at: collectionViewCenterPoint) {
+      // Here, we can set the selectedIndex.
+      if shouldStoreIndex {
+        selectedIndex = indexPath.item
+      }
       if let collectionViewCell = collectionView.cellForItem(at: indexPath) as? OptionCell {
         collectionViewCell.setHighlighted(false)
       }
@@ -169,10 +203,12 @@ extension CameraTypeView {
 
 // MARK: UICollectionViewDelegate
 
-extension CameraTypeView: UICollectionViewDelegate {
+extension FNCameraTypeView: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     let previousIndex = selectedIndex
     selectedIndex = indexPath.item
+    
+    guard previousIndex != selectedIndex else { return }
     
     collectionView.isPagingEnabled = false
     
@@ -200,12 +236,12 @@ extension CameraTypeView: UICollectionViewDelegate {
 
   func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
     debugPrint("scrollViewWillBeginDragging")
-    resetPreviouslyCentedCell(scrollView)
+    resetPreviouslyCentedCell(scrollView, shouldStoreIndex: false)
   }
   
   func scrollViewWillBeginDecelerating(_ scrollView: UIScrollView) {
     debugPrint("scrollViewWillBeginDecelerating")
-    resetPreviouslyCentedCell(scrollView)
+    resetPreviouslyCentedCell(scrollView, shouldStoreIndex: true)
   }
   
   func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
@@ -223,7 +259,7 @@ extension CameraTypeView: UICollectionViewDelegate {
 
 // MARK: - UICollectionViewDelegateFlowLayout
 
-extension CameraTypeView: UICollectionViewDelegateFlowLayout {
+extension FNCameraTypeView: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
     let o = options[indexPath.item]
     return .init(width: o == "VIDEO" || o == "PHOTO" ? 80 : 75, height: 44)
