@@ -169,13 +169,17 @@ extension FNCameraTypeView: UICollectionViewDataSource {
 
 extension FNCameraTypeView {
   // SET ----
-  func setCenteredCell(_ scrollView: UIScrollView) {
+  func setCenteredCell(_ scrollView: UIScrollView, shouldStoreIndex: Bool) {
     guard let superview = self.superview else { return }
     let y = frame.origin.y + 25
     let centerPoint = CGPoint(x: superview.bounds.midX, y: y)
     let collectionViewCenterPoint = superview.convert(centerPoint, to: collectionView)
     
     if let indexPath = collectionView.indexPathForItem(at: collectionViewCenterPoint) {
+      // Here, we can set the selectedIndex.
+      if shouldStoreIndex {
+        selectedIndex = indexPath.item
+      }
       if let collectionViewCell = collectionView.cellForItem(at: indexPath) as? OptionCell {
         collectionViewCell.setHighlighted(true)
       }
@@ -190,10 +194,6 @@ extension FNCameraTypeView {
     let collectionViewCenterPoint = superview.convert(centerPoint, to: collectionView)
     
     if let indexPath = collectionView.indexPathForItem(at: collectionViewCenterPoint) {
-      // Here, we can set the selectedIndex.
-      if shouldStoreIndex {
-        selectedIndex = indexPath.item
-      }
       if let collectionViewCell = collectionView.cellForItem(at: indexPath) as? OptionCell {
         collectionViewCell.setHighlighted(false)
       }
@@ -241,18 +241,18 @@ extension FNCameraTypeView: UICollectionViewDelegate {
   
   func scrollViewWillBeginDecelerating(_ scrollView: UIScrollView) {
     debugPrint("scrollViewWillBeginDecelerating")
-    resetPreviouslyCentedCell(scrollView, shouldStoreIndex: true)
+    resetPreviouslyCentedCell(scrollView, shouldStoreIndex: false)
   }
   
   func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
     debugPrint("scrollViewDidEndDecelerating")
-    setCenteredCell(scrollView)
+    setCenteredCell(scrollView, shouldStoreIndex: true)
   }
   
   func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
     if !decelerate {
       debugPrint("scrollViewDidEndDragging")
-      setCenteredCell(scrollView)
+      setCenteredCell(scrollView, shouldStoreIndex: false)
     }
   }
 }
