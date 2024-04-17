@@ -53,20 +53,20 @@ class OptionCell: UICollectionViewCell {
 }
 
 // MARK: -
-// MARK: CameraTypeView
+// MARK: FNCameraTypeView
 
 enum CameraType {
   case video
   case photo
 }
 
-protocol CameraTypeViewDelegate: AnyObject {
-  func cameraTypeView(_ cameraTypeView: CameraTypeView,
+protocol FNCameraTypeViewDelegate: AnyObject {
+  func cameraTypeView(_ cameraTypeView: FNCameraTypeView,
                       didSelectCameraType type: CameraType)
 }
 
 @IBDesignable
-class CameraTypeView: UIView {
+class FNCameraTypeView: UIView {
   
   // MARK: Properties
   
@@ -85,7 +85,7 @@ class CameraTypeView: UIView {
     }
   }
   
-  private(set) weak var delegate: CameraTypeViewDelegate?
+  private(set) weak var delegate: FNCameraTypeViewDelegate?
   
   lazy var collectionView: UICollectionView = {
     let layout = UICollectionViewFlowLayout()
@@ -112,7 +112,7 @@ class CameraTypeView: UIView {
     setupUI()
   }
   
-  convenience init(delegate: CameraTypeViewDelegate?) {
+  convenience init(delegate: FNCameraTypeViewDelegate?) {
     self.init(frame: .zero)
     self.delegate = delegate
   }
@@ -143,7 +143,7 @@ class CameraTypeView: UIView {
 
 // MARK: UICollectionViewDataSource
 
-extension CameraTypeView: UICollectionViewDataSource {
+extension FNCameraTypeView: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     return options.count
   }
@@ -169,7 +169,7 @@ extension CameraTypeView: UICollectionViewDataSource {
 
 // MARK: Set and Reset
 
-extension CameraTypeView {
+extension FNCameraTypeView {
   // SET ----
   func setCenteredCell(_ scrollView: UIScrollView, shouldStoreIndex: Bool) {
     guard let superview = self.superview else { return }
@@ -205,7 +205,7 @@ extension CameraTypeView {
 
 // MARK: UICollectionViewDelegate
 
-extension CameraTypeView: UICollectionViewDelegate {
+extension FNCameraTypeView: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     let previousIndex = selectedIndex
     selectedIndex = indexPath.item
@@ -261,7 +261,7 @@ extension CameraTypeView: UICollectionViewDelegate {
 
 // MARK: - UICollectionViewDelegateFlowLayout
 
-extension CameraTypeView: UICollectionViewDelegateFlowLayout {
+extension FNCameraTypeView: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
     let o = options[indexPath.item]
     return .init(width: o == "VIDEO" || o == "PHOTO" ? 80 : 75, height: 44)
