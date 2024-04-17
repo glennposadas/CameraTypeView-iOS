@@ -1,5 +1,5 @@
 //
-//  FNCameraTypeView.swift
+//  CameraTypeView.swift
 //  SiteCapture
 //
 //  Created by Glenn Posadas on 4/8/24.
@@ -53,19 +53,20 @@ class OptionCell: UICollectionViewCell {
 }
 
 // MARK: -
-// MARK: FNCameraTypeView
+// MARK: CameraTypeView
 
 enum CameraType {
   case video
   case photo
 }
 
-protocol FNCameraTypeViewDelegate: AnyObject {
-  func cameraTypeView(_ cameraTypeView: FNCameraTypeView,
+protocol CameraTypeViewDelegate: AnyObject {
+  func cameraTypeView(_ cameraTypeView: CameraTypeView,
                       didSelectCameraType type: CameraType)
 }
 
-class FNCameraTypeView: UIView {
+@IBDesignable
+class CameraTypeView: UIView {
   
   // MARK: Properties
   
@@ -84,7 +85,7 @@ class FNCameraTypeView: UIView {
     }
   }
   
-  private(set) weak var delegate: FNCameraTypeViewDelegate?
+  private(set) weak var delegate: CameraTypeViewDelegate?
   
   lazy var collectionView: UICollectionView = {
     let layout = UICollectionViewFlowLayout()
@@ -100,7 +101,6 @@ class FNCameraTypeView: UIView {
     collectionView.dataSource = self
     collectionView.decelerationRate = .fast
     collectionView.register(OptionCell.self, forCellWithReuseIdentifier: "OptionCell")
-    collectionView.backgroundColor = .lightGray
     return collectionView
   }()
   
@@ -112,17 +112,19 @@ class FNCameraTypeView: UIView {
     setupUI()
   }
   
-  convenience init(delegate: FNCameraTypeViewDelegate?) {
+  convenience init(delegate: CameraTypeViewDelegate?) {
     self.init(frame: .zero)
     self.delegate = delegate
   }
   
-  required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+  required public init?(coder aDecoder: NSCoder) {
+    super.init(coder: aDecoder)
+    
+    setupUI()
   }
   
   private func setupUI() {
-    backgroundColor = .black
+    backgroundColor = .clear
     
     addSubview(collectionView)
     NSLayoutConstraint.activate([
@@ -141,7 +143,7 @@ class FNCameraTypeView: UIView {
 
 // MARK: UICollectionViewDataSource
 
-extension FNCameraTypeView: UICollectionViewDataSource {
+extension CameraTypeView: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     return options.count
   }
@@ -167,7 +169,7 @@ extension FNCameraTypeView: UICollectionViewDataSource {
 
 // MARK: Set and Reset
 
-extension FNCameraTypeView {
+extension CameraTypeView {
   // SET ----
   func setCenteredCell(_ scrollView: UIScrollView, shouldStoreIndex: Bool) {
     guard let superview = self.superview else { return }
@@ -203,7 +205,7 @@ extension FNCameraTypeView {
 
 // MARK: UICollectionViewDelegate
 
-extension FNCameraTypeView: UICollectionViewDelegate {
+extension CameraTypeView: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     let previousIndex = selectedIndex
     selectedIndex = indexPath.item
@@ -259,7 +261,7 @@ extension FNCameraTypeView: UICollectionViewDelegate {
 
 // MARK: - UICollectionViewDelegateFlowLayout
 
-extension FNCameraTypeView: UICollectionViewDelegateFlowLayout {
+extension CameraTypeView: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
     let o = options[indexPath.item]
     return .init(width: o == "VIDEO" || o == "PHOTO" ? 80 : 75, height: 44)
