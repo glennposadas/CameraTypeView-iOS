@@ -13,6 +13,7 @@ class ViewController: UIViewController {
   // MARK: Properties
   
   var cameraTypeView: FNCameraTypeView!
+  var v = UIView()
   
   // MARK: -
   // MARK: View Lifecycle
@@ -22,13 +23,27 @@ class ViewController: UIViewController {
     
     view.backgroundColor = .black
     
+    v.backgroundColor = .red
+    v.isUserInteractionEnabled = true
+    view.addSubview(v)
+    
+    v.translatesAutoresizingMaskIntoConstraints = false
+    NSLayoutConstraint.activate([
+      v.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+      v.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+      v.heightAnchor.constraint(equalToConstant: 500),
+      v.widthAnchor.constraint(equalToConstant: view.bounds.width),
+    ])
+    
     cameraTypeView = .init(delegate: self)
     cameraTypeView.translatesAutoresizingMaskIntoConstraints = false
-    view.addSubview(cameraTypeView)
+    v.addSubview(cameraTypeView)
+    
+    cameraTypeView.isUserInteractionEnabled = true
     
     NSLayoutConstraint.activate([
-      cameraTypeView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      cameraTypeView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -16)
+      cameraTypeView.centerXAnchor.constraint(equalTo: v.centerXAnchor),
+      cameraTypeView.bottomAnchor.constraint(equalTo: v.bottomAnchor, constant: -16)
     ])
   }
 }

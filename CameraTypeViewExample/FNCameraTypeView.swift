@@ -1,5 +1,5 @@
 //
-//  CameraTypeView.swift
+//  FNCameraTypeView.swift
 //  SiteCapture
 //
 //  Created by Glenn Posadas on 4/8/24.
@@ -22,6 +22,8 @@ class OptionCell: UICollectionViewCell {
     label.translatesAutoresizingMaskIntoConstraints = false
     return label
   }()
+  
+  var cameraType: CameraType?
   
   // MARK: Functions
   
@@ -55,11 +57,13 @@ class OptionCell: UICollectionViewCell {
 // MARK: -
 // MARK: FNCameraTypeView
 
-enum CameraType {
-  case video
-  case photo
+@objc
+enum CameraType: Int {
+  case photo = 1
+  case video = 2
 }
 
+@objc
 protocol FNCameraTypeViewDelegate: AnyObject {
   func cameraTypeView(_ cameraTypeView: FNCameraTypeView,
                       didSelectCameraType type: CameraType)
@@ -71,21 +75,29 @@ class FNCameraTypeView: UIView {
   // MARK: Properties
   
   let options: [String] = ["", "PHOTO", "VIDEO", ""]
+  
   private(set) var selectedIndex = 1 {
     didSet {
       let newSelectedType: CameraType = selectedIndex == 1 ? .photo : .video
+      debugPrint("CameraTypeView --> From  \(selectedType) -- to -- \(newSelectedType)")
       if selectedType != newSelectedType {
         selectedType = newSelectedType
       }
     }
   }
+  
+  @objc
   private(set) var selectedType: CameraType = .photo {
     didSet {
       delegate?.cameraTypeView(self, didSelectCameraType: selectedType)
     }
   }
   
-  private(set) weak var delegate: FNCameraTypeViewDelegate?
+  var newCenteredIndexWasFromDragging: Bool = false
+  var previouslyCenteredIndex: Int?
+  
+  @objc
+  weak var delegate: FNCameraTypeViewDelegate?
   
   lazy var collectionView: UICollectionView = {
     let layout = UICollectionViewFlowLayout()
@@ -156,10 +168,12 @@ extension FNCameraTypeView: UICollectionViewDataSource {
     if options[indexPath.item] == "PHOTO" {
       
       cell.setHighlighted(selectedIndex == 1)
+      cell.cameraType = .photo
       
     } else if options[indexPath.item] == "VIDEO" {
       
       cell.setHighlighted(selectedIndex == 2)
+      cell.cameraType = .video
       
     }
     
@@ -201,43 +215,58 @@ extension FNCameraTypeView {
       }
     }
   }
+  
+  func resetPreviouslyCentedCell(at indexPath: IndexPath) {
+    if let collectionViewCell = collectionView.cellForItem(at: indexPath) as? OptionCell {
+      collectionViewCell.setHighlighted(false)
+    }
+  }
 }
 
 // MARK: UICollectionViewDelegate
 
 extension FNCameraTypeView: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-    let previousIndex = selectedIndex
-    selectedIndex = indexPath.item
+    debugPrint("didSelectItemAt - \(indexPath.item)")
     
-    guard previousIndex != selectedIndex else { return }
+    let previousIndex = selectedIndex
+    let currentIndex = indexPath.item
+    
+    guard currentIndex == 1 || currentIndex == 2 else { return }
+    
+    newCenteredIndexWasFromDragging = false
+    selectedIndex = indexPath.item
     
     collectionView.isPagingEnabled = false
     
     let selectedIndexPath = IndexPath(item: selectedIndex, section: 0)
     collectionView.scrollToItem(at: selectedIndexPath, at: .centeredHorizontally, animated: true)
     
-    if let collectionViewCell = collectionView.cellForItem(at: indexPath) as? OptionCell {
-      collectionViewCell.setHighlighted(true)
-    }
-    
     if let previousSelectedCell = collectionView.cellForItem(at: IndexPath(item: previousIndex, section: 0)) as? OptionCell {
       previousSelectedCell.setHighlighted(false)
     }
     
+    if let currentSelectedCell = collectionView.cellForItem(at: indexPath) as? OptionCell {
+      currentSelectedCell.setHighlighted(true)
+      currentSelectedCell.cameraType = .init(rawValue: selectedIndex)
+    }
+    
     collectionView.isPagingEnabled = true
   }
-    
+  
   func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+    debugPrint("didDeselectItemAt")
+    
     if let collectionViewCell = collectionView.cellForItem(at: indexPath) as? OptionCell {
       collectionViewCell.setHighlighted(false)
     }
   }
   
   // MARK: ScrollView Delegate
-
+  
   func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
     debugPrint("scrollViewWillBeginDragging")
+    newCenteredIndexWasFromDragging = true
     resetPreviouslyCentedCell(scrollView, shouldStoreIndex: false)
   }
   
@@ -247,14 +276,18 @@ extension FNCameraTypeView: UICollectionViewDelegate {
   }
   
   func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-    debugPrint("scrollViewDidEndDecelerating")
-    setCenteredCell(scrollView, shouldStoreIndex: true)
+    let previouslyCenteredIndex = previouslyCenteredIndex
+    setCenteredCell(scrollView, shouldStoreIndex: newCenteredIndexWasFromDragging)
+    
+    if let previouslyCenteredIndex = previouslyCenteredIndex, previouslyCenteredIndex != selectedIndex {
+      resetPreviouslyCentedCell(at: IndexPath(item: previouslyCenteredIndex, section: 0))
+    }
   }
   
   func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
     if !decelerate {
-      debugPrint("scrollViewDidEndDragging")
       setCenteredCell(scrollView, shouldStoreIndex: false)
+      previouslyCenteredIndex = selectedIndex
     }
   }
 }
